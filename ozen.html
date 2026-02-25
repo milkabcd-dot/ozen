@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>מגדל אוזני המן - אתגר מרכז הכובד</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.18.0/matter.min.js"></script>
+    <style>
+        body { margin: 0; background: #faf3e0; font-family: 'Segoe UI', system-ui; overflow: hidden; }
+        #sidebar { position: absolute; right: 20px; top: 20px; width: 220px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 100; border: 2px solid #e67e22; }
+        h1 { color: #d35400; font-size: 20px; margin: 0; }
+        .credit { font-weight: bold; color: #2c3e50; margin: 10px 0; font-size: 14px; }
+        .score-box { font-size: 32px; color: #e67e22; font-weight: bold; margin: 15px 0; }
+        .instructions { font-size: 13px; color: #555; line-height: 1.4; text-align: right; }
+        kbd { background: #eee; border-radius: 3px; padding: 2px 4px; border: 1px solid #ccc; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar">
+        <h1>מגדל אוזני המן</h1>
+        <div class="credit">עריכה: מילכה ברקו גרש</div>
+        <div class="score-box" id="score">0</div>
+        <div class="instructions">
+            <strong>טקטיקה ומרכז כובד:</strong><br>
+            הזיזו עם ה<strong>עכבר</strong>.<br>
+            סובבו עם חצים <kbd>←</kbd> <kbd>→</kbd>.<br>
+            לחצו על ה<strong>עכבר</strong> להפלה.<br><br>
+            <em>טיפ:</em> השפיץ של המשולש הוא הנקודה הכי פחות יציבה. נסו להנחית על הצלעות השטוחות.
+        </div>
+    </div>
+
+    <script>
+        const { Engine, Render, Runner, Bodies, Composite, Body, Events } = Matter;
+        
+        const engine = Engine.create();
+        const render = Render.create({
+            element: document.body,
+            engine: engine,
+            options: { 
+                width: window.innerWidth, 
+                height: window.innerHeight, 
+                wireframes: false, 
+                background: '#faf3e0' 
+            }
+        });
+
+        // יצירת מגש (רצפה)
+        const tray = Bodies.rectangle(window.innerWidth/2 - 100, window.innerHeight - 60, 350, 20, { 
+            isStatic: true, 
+            render: { fillStyle: '#4e342e' } 
+        });
+        Composite.add(engine.world, tray);
+
+        let currentPiece = null;
+        let currentRotation = 0;
+        let score = 0;
+        let isGameOver = false;
+
+        function createHamantash(x) {
+            if (isGameOver) return;
+            
+            currentRotation = 0;
+            const size = 45;
+            
+            // יצירת גוף פיזיקלי משולש
+            currentPiece = Bodies.polygon(x, 80, 3, size, {
+                isStatic: true,
+                friction: 0.6,
+                restitution: 0.1,
+                render: {
+                    fillStyle: '#f3b379', // צבע בצק
+                    strokeStyle: '#3e2723', // צבע מילוי (שוקולד)
+                    lineWidth: 18 // יוצר מראה של מילוי במרכז
+                }
+            });
+            
+            Composite.add(engine.world, currentPiece);
+        }
+
+        // שליטה עם העכבר והמקלדת
+        window.addEventListener('mousemove', (e) => {
+            if (currentPiece && currentPiece.isStatic) {
+                Body.setPosition(currentPiece, { x: e.clientX, y: 80 });
+            }
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if (!currentPiece || !currentPiece.isStatic) return;
+            if (e.key === 'ArrowLeft') {
+                currentRotation -= 0.2;
+                Body.setAngle(currentPiece, currentRotation);
+            }
+            if (e.key === 'ArrowRight') {
+                currentRotation += 0.2;
+                Body.setAngle(currentPiece, currentRotation);
+            }
+        });
+
+        window.addEventListener('mousedown', () => {
+            if (currentPiece && currentPiece.isStatic) {
+                Body.setStatic(currentPiece, false);
+                const tempPiece = currentPiece;
+                currentPiece = null;
+                
+                // בדיקה אם האוזן נפלה מהמגש
+                setTimeout(() => {
+                    if (tempPiece.position.y > window.innerHeight) {
+                        alert("האוזן נפלה מהמגש! ניקוד סופי: " + score);
+                        location.reload();
+                    } else {
+                        score++;
+                        document.getElementById('score').innerText = score;
+                        createHamantash(window.innerWidth / 2);
+                    }
+                }, 3000);
+            }
+        });
+
+        // התחלת משחק
+        createHamantash(window.innerWidth / 2);
+        Render.run(render);
+        Runner.run(Runner.create(), engine);
+
+        window.addEventListener('resize', () => {
+            render.canvas.width = window.innerWidth;
+            render.canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
