@@ -6,19 +6,17 @@
     <title>פורים שמח - מכונת העצות</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #f3e5f5; text-align: center; padding: 20px; min-height: 100vh; margin: 0; color: #4a148c; }
-        h1 { color: #880e4f; font-size: 2.5em; margin-bottom: 5px; }
-        .subtitle { font-size: 1.2em; font-weight: bold; margin-bottom: 25px; }
+        h1 { color: #880e4f; font-size: 2.2em; margin-bottom: 5px; }
+        .subtitle { font-size: 1.1em; font-weight: bold; margin-bottom: 25px; }
         .container { display: flex; flex-wrap: wrap; justify-content: center; gap: 25px; }
         .card-wrapper { position: relative; width: 300px; height: 170px; border-radius: 15px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.3); background: white; border: 4px solid #fff; }
-        .result { position: absolute; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 15px; background: linear-gradient(135deg, #fff 0%, #fce4ec 100%); }
-        .char-name { font-size: 1.4em; font-weight: bold; color: #880e4f; }
+        .result { position: absolute; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px; box-sizing: border-box; background: linear-gradient(135deg, #fff 0%, #fce4ec 100%); }
+        .char-name { font-size: 1.3em; font-weight: bold; color: #880e4f; margin-bottom: 5px; }
+        .char-msg { font-size: 0.95em; color: #311b92; line-height: 1.4; text-align: center; }
         canvas { position: absolute; top: 0; left: 0; z-index: 10; touch-action: none; cursor: pointer; }
         
-        /* קרדיט בולט */
-        .credit { margin-top: 50px; font-size: 1.2em; color: #fff; background: #880e4f; padding: 10px 20px; border-radius: 50px; display: inline-block; box-shadow: 0 4px 10px rgba(0,0,0,0.2); border: 2px solid #ffd700; }
-        
-        /* קונפטי */
-        .confetti { position: absolute; width: 10px; height: 10px; background-color: #f00; opacity: 0; }
+        .credit { margin-top: 50px; font-size: 1.1em; color: #fff; background: #880e4f; padding: 10px 20px; border-radius: 50px; display: inline-block; box-shadow: 0 4px 10px rgba(0,0,0,0.2); border: 2px solid #ffd700; font-weight: bold;}
+        .confetti { position: absolute; width: 10px; height: 10px; background-color: #f00; opacity: 0; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -32,12 +30,12 @@
 
 <script>
     const surprises = [
-        { char: "אסתר המלכה 👑", msg: "יש לך כוח השפעה אדיר. זה הזמן להשמיע את הקול הייחודי שלך!" },
-        { char: "מרדכי הצדיק 📜", msg: "התמדה ואמונה בדרך שלך הן המפתח. כדאי ללכת בראש מורם." },
-        { char: "אחשוורוש החגיגי 🍷", msg: "החיים הם מסיבה! זמן מצוין ליהנות מהרגע ולחגוג הצלחות." },
-        { char: "ושתי העצמאית 💅", msg: "הידיעה מה הערך שלך היא כוח. לפעמים 'לא' הוא התשובה הנכונה." },
-        { char: "המן (בגרסה טובה) 📐", msg: "יש לך יכולת תכנון נהדרת. נתב את זה לעשיית טוב לסובבים." },
-        { char: "הליצן המסתורי 🤡", msg: "חיוך הוא כוח-על. הפוך/הפכי כל יום רגיל לחג!" }
+        { char: "אסתר המלכה 👑", msg: "יש לך כוח השפעה אדיר.<br>זה הזמן להשמיע את הקול הייחודי שלך!" },
+        { char: "מרדכי הצדיק 📜", msg: "התמדה ואמונה בדרך שלך הן המפתח.<br>מומלץ ללכת בראש מורם." },
+        { char: "אחשוורוש החגיגי 🍷", msg: "החיים הם מסיבה!<br>זמן מצוין ליהנות מהרגע ולחגוג הצלחות." },
+        { char: "ושתי העצמאית 💅", msg: "הידיעה מה הערך שלך היא כוח.<br>לפעמים 'לא' הוא התשובה הנכונה." },
+        { char: "המן (בגרסה טובה) 📐", msg: "יש לך יכולת תכנון נהדרת.<br>נתב את זה לעשיית טוב לסובבים." },
+        { char: "הליצן המסתורי 🤡", msg: "חיוך הוא כוח-על.<br>הפוך/הפכי כל יום רגיל לחג!" }
     ];
 
     function createConfetti(x, y) {
@@ -55,7 +53,7 @@
     surprises.forEach((item, index) => {
         const wrapper = document.createElement('div');
         wrapper.className = 'card-wrapper';
-        wrapper.innerHTML = `<div class="result"><div class="char-name">${item.char}</div><p>${item.msg}</p></div><canvas id="canvas${index}" width="300" height="170"></canvas>`;
+        wrapper.innerHTML = `<div class="result"><div class="char-name">${item.char}</div><div class="char-msg">${item.msg}</div></div><canvas id="canvas${index}" width="300" height="170"></canvas>`;
         container.appendChild(wrapper);
 
         const canvas = document.getElementById(`canvas${index}`);
@@ -71,7 +69,7 @@
             const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
             ctx.globalCompositeOperation = 'destination-out';
             ctx.beginPath(); ctx.arc(x, y, 20, 0, Math.PI * 2); ctx.fill();
-            if(Math.random() > 0.9) createConfetti(e.clientX || e.touches[0].clientX, e.clientY || e.touches[0].clientY);
+            if(Math.random() > 0.8) createConfetti(e.clientX || e.touches[0].clientX, e.clientY || e.touches[0].clientY);
         };
         canvas.addEventListener('mousedown', () => isDrawing = true);
         canvas.addEventListener('mousemove', move);
