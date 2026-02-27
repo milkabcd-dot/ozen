@@ -7,13 +7,19 @@
     <style>
         body { 
             font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; text-align: center; color: #4a148c;
+            /* הטאפט הצבעוני המלא */
             background-color: #f3e5f5; 
-            background-image: radial-gradient(#ffeb3b 10%, transparent 10%), radial-gradient(#e91e63 10%, transparent 10%), radial-gradient(#2196f3 10%, transparent 10%), radial-gradient(#4caf50 10%, transparent 10%);
-            background-size: 30px 30px;
+            background-image: 
+                radial-gradient(#ffeb3b 15%, transparent 15%), 
+                radial-gradient(#e91e63 15%, transparent 15%), 
+                radial-gradient(#2196f3 15%, transparent 15%), 
+                radial-gradient(#4caf50 15%, transparent 15%);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px, 0 30px, 30px 0;
         }
         
         h1 { color: #880e4f; font-size: 2.2em; margin-bottom: 5px; }
-        .subtitle { font-size: 1.1em; font-weight: bold; margin-bottom: 25px; background: rgba(255,255,255,0.7); padding: 10px; border-radius: 15px; display: inline-block; }
+        .subtitle { font-size: 1.1em; font-weight: bold; margin-bottom: 25px; background: rgba(255,255,255,0.8); padding: 10px; border-radius: 15px; display: inline-block; }
         
         .container { 
             display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
@@ -28,11 +34,14 @@
         
         canvas { position: absolute; top: 0; left: 0; z-index: 10; touch-action: none; cursor: pointer; }
         
-        .confetti-particle { 
-            position: absolute; width: 8px; height: 8px; opacity: 1; pointer-events: none; z-index: 5; 
-        }
+        .confetti-particle { position: absolute; width: 8px; height: 8px; opacity: 1; pointer-events: none; z-index: 5; }
         
-        .credit { margin-top: 40px; font-size: 1.1em; color: #880e4f; font-weight: bold; }
+        /* קרדיט מובלט */
+        .credit { 
+            margin-top: 40px; font-size: 1.2em; color: #fff; background: #880e4f; 
+            padding: 10px 25px; border-radius: 50px; display: inline-block; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-weight: bold; border: 2px solid #ffd700;
+        }
     </style>
 </head>
 <body>
@@ -67,7 +76,7 @@
         ctx.fillStyle = '#9e9e9e'; ctx.fillRect(0, 0, 280, 160);
         ctx.fillStyle = 'white'; ctx.font = 'bold 20px Arial'; ctx.textAlign = 'center'; ctx.fillText('🎭 גרד/י כאן! ✨', 140, 85);
 
-        const createConfetti = (x, y) => {
+        const createConfetti = (x, y, wrapper) => {
             for(let i = 0; i < 8; i++) {
                 const c = document.createElement('div');
                 c.className = 'confetti-particle';
@@ -87,7 +96,7 @@
             const y = clientY - rect.top;
             ctx.globalCompositeOperation = 'destination-out';
             ctx.beginPath(); ctx.arc(x, y, 20, 0, Math.PI * 2); ctx.fill();
-            if(Math.random() > 0.8) createConfetti(x, y);
+            if(Math.random() > 0.8) createConfetti(x, y, wrapper);
         };
 
         canvas.addEventListener('mousemove', (e) => { if(e.buttons) scratch(e.clientX, e.clientY); });
