@@ -10,11 +10,7 @@
             background-color: #f3e5f5; 
             background-image: radial-gradient(#ffeb3b 10%, transparent 10%), radial-gradient(#e91e63 10%, transparent 10%), radial-gradient(#2196f3 10%, transparent 10%), radial-gradient(#4caf50 10%, transparent 10%);
             background-size: 30px 30px;
-            background-position: 0 0, 15px 15px, 0 15px, 15px 0;
         }
-        
-        h1 { color: #880e4f; font-size: 2.2em; margin-bottom: 5px; }
-        .subtitle { font-size: 1.1em; font-weight: bold; margin-bottom: 25px; background: rgba(255,255,255,0.7); padding: 10px; border-radius: 15px; display: inline-block; }
         
         .container { 
             display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
@@ -29,48 +25,30 @@
         
         canvas { position: absolute; top: 0; left: 0; z-index: 10; touch-action: none; cursor: pointer; }
         
-        /* החלקיקים חייבים להיות עם pointer-events: none כדי לא לחסום את המגע */
+        /* הקונפטי מוגדר עכשיו בתוך ה-wrapper */
         .confetti-particle { 
             position: absolute; width: 8px; height: 8px; opacity: 1; pointer-events: none; z-index: 5; 
         }
-        
-        .credit { margin-top: 40px; font-size: 1.1em; color: #880e4f; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <h1>🎭 פורים שמח ומבדח!</h1>
-    <div class="subtitle">גרד/י את אחד הכרטיסים וקבל/י עצה מדמות במגילה:</div>
-
     <div class="container" id="cards-container"></div>
-
-    <div class="credit">עריכה: מילכה ברקו גרש</div>
+    <div class="credit" style="margin-top: 40px; font-weight: bold; color: #880e4f;">עריכה: מילכה ברקו גרש</div>
 
 <script>
     const surprises = [
-        { char: "אסתר המלכה 👑", msg: "יש לך כוח השפעה אדיר.<br>זה הזמן להשמיע את הקול שלך!" },
-        { char: "מרדכי הצדיק 📜", msg: "התמדה בדרך שלך היא המפתח.<br>מומלץ ללכת בראש מורם." },
-        { char: "אחשוורוש החגיגי 🍷", msg: "החיים הם מסיבה!<br>זמן מצוין ליהנות מהרגע." },
-        { char: "ושתי העצמאית 💅", msg: "הידיעה מה הערך שלך היא כוח.<br>לפעמים 'לא' זה נכון." },
-        { char: "המן (בגרסה טובה) 📐", msg: "יש לך יכולת תכנון נהדרת.<br>נתב/י את זה לטובה." },
-        { char: "הליצן המסתורי 🤡", msg: "חיוך הוא כוח-על.<br>הפוך/הפכי כל יום לחג!" }
+        { char: "אסתר המלכה 👑", msg: "יש לך כוח השפעה אדיר." },
+        { char: "מרדכי הצדיק 📜", msg: "התמדה בדרך שלך היא המפתח." },
+        { char: "אחשוורוש החגיגי 🍷", msg: "החיים הם מסיבה!" },
+        { char: "ושתי העצמאית 💅", msg: "דע/י את הערך שלך." },
+        { char: "המן (בגרסה טובה) 📐", msg: "נתב/י את הכישרון לעשיית טוב." },
+        { char: "הליצן המסתורי 🤡", msg: "חיוך הוא כוח-על!" }
     ];
 
-    function createConfetti(x, y) {
-        for(let i = 0; i < 10; i++) {
-            const c = document.createElement('div');
-            c.className = 'confetti-particle';
-            c.style.left = x + 'px'; c.style.top = y + 'px';
-            c.style.backgroundColor = ['#f44336', '#2196f3', '#ffeb3b', '#4caf50'][Math.floor(Math.random()*4)];
-            document.body.appendChild(c);
-            c.animate([
-                { transform: 'translate(0,0) rotate(0deg)', opacity: 1 }, 
-                { transform: `translate(${(Math.random()-0.5)*100}px, ${(Math.random()-0.5)*100}px) rotate(360deg)`, opacity: 0 }
-            ], { duration: 600 }).onfinish = () => c.remove();
-        }
-    }
-
     const container = document.getElementById('cards-container');
+    
     surprises.forEach((item, index) => {
         const wrapper = document.createElement('div');
         wrapper.className = 'card-wrapper';
@@ -82,11 +60,27 @@
         ctx.fillStyle = '#9e9e9e'; ctx.fillRect(0, 0, 280, 160);
         ctx.fillStyle = 'white'; ctx.font = '20px Arial'; ctx.textAlign = 'center'; ctx.fillText('🎭 גרד/י כאן! ✨', 140, 85);
 
+        const createConfetti = (x, y) => {
+            for(let i = 0; i < 8; i++) {
+                const c = document.createElement('div');
+                c.className = 'confetti-particle';
+                c.style.left = x + 'px'; c.style.top = y + 'px';
+                c.style.backgroundColor = ['#f44336', '#2196f3', '#ffeb3b', '#4caf50'][Math.floor(Math.random()*4)];
+                wrapper.appendChild(c); // הוספה לתוך ה-wrapper של הכרטיס הספציפי!
+                c.animate([
+                    { transform: 'translate(0,0) rotate(0deg)', opacity: 1 }, 
+                    { transform: `translate(${(Math.random()-0.5)*100}px, ${(Math.random()-0.5)*100}px) rotate(360deg)`, opacity: 0 }
+                ], { duration: 600 }).onfinish = () => c.remove();
+            }
+        };
+
         const scratch = (clientX, clientY) => {
             const rect = canvas.getBoundingClientRect();
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
             ctx.globalCompositeOperation = 'destination-out';
-            ctx.beginPath(); ctx.arc(clientX - rect.left, clientY - rect.top, 20, 0, Math.PI * 2); ctx.fill();
-            if(Math.random() > 0.8) createConfetti(clientX, clientY);
+            ctx.beginPath(); ctx.arc(x, y, 20, 0, Math.PI * 2); ctx.fill();
+            if(Math.random() > 0.8) createConfetti(x, y);
         };
 
         canvas.addEventListener('mousemove', (e) => { if(e.buttons) scratch(e.clientX, e.clientY); });
