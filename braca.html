@@ -3,116 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>פורים שמח!</title>
+    <title>פורים שמח - מכונת העצות</title>
     <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            overflow-x: hidden;
+            touch-action: pan-y;
+        }
+
         body { 
             font-family: 'Segoe UI', sans-serif; 
-            
-            /* הגדרה מפורשת של נקודות צבעוניות לרקע (קונפטי) */
-            background-color: #f3e5f5; /* צבע רקע בסיסי (סגול בהיר) */
-            
-            /* שכבה 1: נקודות צהובות */
-            background-image: radial-gradient(#ffeb3b 10%, transparent 10%), 
-            /* שכבה 2: נקודות אדומות/ורודות */
-                             radial-gradient(#e91e63 10%, transparent 10%), 
-            /* שכבה 3: נקודות כחולות */
-                             radial-gradient(#2196f3 10%, transparent 10%), 
-            /* שכבה 4: נקודות ירוקות */
-                             radial-gradient(#4caf50 10%, transparent 10%);
-            
-            /* גודל ומיקום לכל שכבה כדי ליצור את האפקט המפוזר */
+            background-color: #f3e5f5; 
+            background-image: radial-gradient(#ffeb3b 10%, transparent 10%), radial-gradient(#e91e63 10%, transparent 10%), radial-gradient(#2196f3 10%, transparent 10%), radial-gradient(#4caf50 10%, transparent 10%);
             background-size: 30px 30px;
-            background-position: 0 0, 15px 15px, 0 15px, 15px 0;
-            
             text-align: center; 
             padding: 20px; 
-            margin: 0; 
-            overflow-x: hidden; 
             color: #4a148c; 
         }
         
-        h1 { color: #880e4f; font-size: 2.2em; margin-bottom: 5px; text-shadow: 1px 1px 2px white; }
-        
-        .subtitle { 
-            font-size: 1.1em; 
-            font-weight: bold; 
-            margin-bottom: 25px; 
-            background: rgba(255,255,255,0.7);
-            padding: 10px;
-            border-radius: 15px;
-            display: inline-block;
-            max-width: 90%;
-        }
-        
+        /* התיקון למרכוז הכרטיסים */
         .container { 
-            display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
-            gap: 20px; width: 100%; margin: 0 auto;
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: center; /* מרכז אופקית */
+            align-items: center;     /* מרכז אנכית אם צריך */
+            gap: 20px; 
+            width: 100%;             /* תופס את כל רוחב המסך */
+            max-width: 900px;        /* מונע מהם להתרחב יותר מדי במחשב */
+            margin: 0 auto;          /* ממקם את הקונטיינר עצמו באמצע */
         }
         
         .card-wrapper { 
-            position: relative; width: 280px; height: 160px; border-radius: 15px; 
-            overflow: hidden; box-shadow: 0 6px 15px rgba(0,0,0,0.2); 
-            background: white; border: 3px solid #fff;
+            position: relative; 
+            width: 280px; 
+            height: 160px; 
+            border-radius: 15px; 
+            overflow: hidden; 
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2); 
+            background: white; 
+            border: 3px solid #fff; 
         }
         
-        .result { 
-            position: absolute; width: 100%; height: 100%; display: flex; 
-            flex-direction: column; align-items: center; justify-content: center; 
-            padding: 10px; box-sizing: border-box; background: linear-gradient(135deg, #fff 0%, #fce4ec 100%); 
-        }
-        
-        .char-name { font-size: 1.3em; font-weight: bold; color: #880e4f; margin-bottom: 5px; }
-        .char-msg { font-size: 0.95em; color: #311b92; line-height: 1.4; text-align: center; }
-        canvas { position: absolute; top: 0; left: 0; z-index: 10; touch-action: none; cursor: crosshair; }
-        
-        .credit { 
-            margin-top: 40px; font-size: 1.1em; color: #fff; background: #880e4f; 
-            padding: 10px 20px; border-radius: 50px; display: inline-block; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2); border: 2px solid #ffd700; font-weight: bold;
+        canvas { 
+            position: absolute; top: 0; left: 0; z-index: 10; 
+            touch-action: none; 
+            cursor: pointer; 
         }
     </style>
 </head>
 <body>
-
-    <h1>🎭 פורים שמח ומבדח! ✨</h1>
+    <h1>🎭 פורים שמח ומבדח!</h1>
     <div class="subtitle">גרד/י את אחד הכרטיסים וקבל/י עצה מדמות במגילה:</div>
-
     <div class="container" id="cards-container"></div>
-
     <div class="credit">עריכה: מילכה ברקו גרש</div>
 
 <script>
+    // הוספתי כאן את הלוגיקה החסרה של הקוד שצירפת כדי שהכל יעבוד
     const surprises = [
-        { char: "אסתר המלכה 👑", msg: "יש לך כוח השפעה אדיר.<br>זה הזמן להשמיע את הקול הייחודי שלך!" },
-        { char: "מרדכי הצדיק 📜", msg: "התמדה ואמונה בדרך שלך הן המפתח.<br>מומלץ ללכת בראש מורם." },
-        { char: "אחשוורוש החגיגי 🍷", msg: "החיים הם מסיבה!<br>זמן מצוין ליהנות מהרגע ולחגוג הצלחות." },
-        { char: "ושתי העצמאית 💅", msg: "הידיעה מה הערך שלך היא כוח.<br>לפעמים 'לא' הוא התשובה הנכונה." },
-        { char: "המן (בגרסה טובה) 📐", msg: "יש לך יכולת תכנון נהדרת.<br>נתב את זה לעשיית טוב לסובבים." },
-        { char: "הליצן המסתורי 🤡", msg: "חיוך הוא כוח-על.<br>הפוך/הפכי כל יום רגיל לחג!" }
+        { char: "אסתר המלכה 👑", msg: "יש לך כוח השפעה אדיר." },
+        { char: "מרדכי הצדיק 📜", msg: "התמדה בדרך שלך היא המפתח." },
+        { char: "אחשוורוש החגיגי 🍷", msg: "החיים הם מסיבה!" },
+        { char: "ושתי העצמאית 💅", msg: "דע/י את הערך שלך." },
+        { char: "המן (בגרסה טובה) 📐", msg: "נתב/י את הכישרון לעשיית טוב." },
+        { char: "הליצן המסתורי 🤡", msg: "חיוך הוא כוח-על!" }
     ];
 
     const container = document.getElementById('cards-container');
     surprises.forEach((item, index) => {
         const wrapper = document.createElement('div');
         wrapper.className = 'card-wrapper';
-        wrapper.innerHTML = `<div class="result"><div class="char-name">${item.char}</div><div class="char-msg">${item.msg}</div></div><canvas id="canvas${index}" width="280" height="160"></canvas>`;
+        wrapper.innerHTML = `<div style="padding:20px;"><strong>${item.char}</strong><p>${item.msg}</p></div><canvas id="canvas${index}" width="280" height="160"></canvas>`;
         container.appendChild(wrapper);
 
         const canvas = document.getElementById(`canvas${index}`);
         const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#999'; ctx.fillRect(0, 0, 280, 160);
-        ctx.fillStyle = 'white'; ctx.font = 'bold 20px Arial'; ctx.textAlign = 'center'; ctx.fillText('🎭 גרד/י כאן! ✨', 140, 85);
+        ctx.fillStyle = '#9e9e9e'; ctx.fillRect(0, 0, 280, 160);
+        ctx.fillStyle = 'white'; ctx.font = '20px Arial'; ctx.textAlign = 'center'; ctx.fillText('גרד/י כאן!', 140, 85);
 
         const scratch = (e) => {
             const rect = canvas.getBoundingClientRect();
-            const x = (e.clientX || e.touches[0].clientX) - rect.left;
-            const y = (e.clientY || e.touches[0].clientY) - rect.top;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
             ctx.globalCompositeOperation = 'destination-out';
-            ctx.beginPath(); ctx.arc(x, y, 20, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(clientX - rect.left, clientY - rect.top, 20, 0, Math.PI * 2); ctx.fill();
         };
 
         canvas.addEventListener('mousemove', (e) => { if(e.buttons) scratch(e); });
-        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); scratch(e.touches[0]); }, {passive: false});
+        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); scratch(e); }, { passive: false });
     });
 </script>
 </body>
