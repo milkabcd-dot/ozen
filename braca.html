@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>איזו דמות פורים את/ה?</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fdf6e3; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; max-width: 400px; border: 3px solid #8e44ad; }
+        h1 { color: #8e44ad; }
+        button { background-color: #f1c40f; border: none; padding: 15px 25px; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 20px; transition: 0.3s; }
+        button:hover { background-color: #d4ac0d; }
+        #result { margin-top: 20px; font-size: 18px; color: #333; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>🎭 פורים שמח!</h1>
+    <p>לחצו על הכפתור כדי לגלות איזו דמות פורימית אתם השנה:</p>
+    <button onclick="reveal()">גלה את הדמות שלי!</button>
+    <div id="result"></div>
+</div>
+
+<script>
+    function reveal() {
+        const characters = [
+            "אסתר המלכה – את/ה חכם/ה, אמיץ/ה ויודע/ת להוביל את העניינים!",
+            "מרדכי היהודי – עקשן/ית לטובה, נאמן/ה לעצמך ולא מוותר/ת על עקרונות.",
+            "אחשוורוש – נהנתן/ית קלאסי/ת, יודע/ת ליהנות מהחיים (ולפעמים קצת מפוזר/ת!).",
+            "ושתי – חזק/ה, עצמאי/ת ולא דופק/ת חשבון לאף אחד!",
+            "ליצן פורים – את/ה הנשמה של החברה, תמיד מחפש/ת את הצחוק."
+        ];
+        const randomChar = characters[Math.floor(Math.random() * characters.length)];
+        document.getElementById("result").innerText = "יצאת: " + randomChar;
+    }
+</script>
+
+</body>
+</html>
