@@ -5,18 +5,118 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>פורים שמח - מכונת העצות</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f3e5f5; text-align: center; padding: 20px; min-height: 100vh; margin: 0; color: #4a148c; }
-        h1 { color: #880e4f; font-size: 2.2em; margin-bottom: 5px; }
-        .subtitle { font-size: 1.1em; font-weight: bold; margin-bottom: 25px; }
-        .container { display: flex; flex-wrap: wrap; justify-content: center; gap: 25px; }
-        .card-wrapper { position: relative; width: 300px; height: 170px; border-radius: 15px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.3); background: white; border: 4px solid #fff; }
-        .result { position: absolute; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px; box-sizing: border-box; background: linear-gradient(135deg, #fff 0%, #fce4ec 100%); }
-        .char-name { font-size: 1.3em; font-weight: bold; color: #880e4f; margin-bottom: 5px; }
-        .char-msg { font-size: 0.95em; color: #311b92; line-height: 1.4; text-align: center; }
-        canvas { position: absolute; top: 0; left: 0; z-index: 10; touch-action: none; cursor: pointer; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            /* החזרת רקע הנקודות הצבעוניות (קונפטי רקע) */
+            background-color: #f3e5f5; 
+            background-image: 
+                radial-gradient(#ffeb3b 10%, transparent 10%),
+                radial-gradient(#e91e63 10%, transparent 10%),
+                radial-gradient(#2196f3 10%, transparent 10%),
+                radial-gradient(#4caf50 10%, transparent 10%);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px, 0 15px, 15px 0;
+            
+            text-align: center; 
+            padding: 20px; 
+            min-height: 100vh; 
+            margin: 0; 
+            color: #4a148c; 
+        }
         
-        .credit { margin-top: 50px; font-size: 1.1em; color: #fff; background: #880e4f; padding: 10px 20px; border-radius: 50px; display: inline-block; box-shadow: 0 4px 10px rgba(0,0,0,0.2); border: 2px solid #ffd700; font-weight: bold;}
-        .confetti { position: absolute; width: 10px; height: 10px; background-color: #f00; opacity: 0; pointer-events: none; }
+        h1 { 
+            color: #880e4f; 
+            font-size: 2.2em; 
+            margin-bottom: 5px; 
+            text-shadow: 2px 2px 4px rgba(255,255,255,0.8);
+        }
+        
+        .subtitle { 
+            font-size: 1.1em; 
+            font-weight: bold; 
+            margin-bottom: 25px; 
+            background: rgba(255,255,255,0.7);
+            padding: 5px 15px;
+            border-radius: 15px;
+            display: inline-block;
+        }
+        
+        .container { 
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+            gap: 25px; 
+        }
+        
+        .card-wrapper { 
+            position: relative; 
+            width: 300px; 
+            height: 170px; 
+            border-radius: 15px; 
+            overflow: hidden; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3); 
+            background: white; 
+            border: 4px solid #fff; 
+        }
+        
+        .result { 
+            position: absolute; 
+            width: 100%; 
+            height: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 10px; 
+            box-sizing: border-box; 
+            background: linear-gradient(135deg, #fff 0%, #fce4ec 100%); 
+        }
+        
+        .char-name { 
+            font-size: 1.3em; 
+            font-weight: bold; 
+            color: #880e4f; 
+            margin-bottom: 5px; 
+        }
+        
+        .char-msg { 
+            font-size: 0.95em; 
+            color: #311b92; 
+            line-height: 1.4; 
+            text-align: center; 
+        }
+        
+        canvas { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            z-index: 10; 
+            touch-action: none; 
+            cursor: pointer; 
+        }
+        
+        .credit { 
+            margin-top: 50px; 
+            font-size: 1.1em; 
+            color: #fff; 
+            background: #880e4f; 
+            padding: 10px 20px; 
+            border-radius: 50px; 
+            display: inline-block; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
+            border: 2px solid #ffd700; 
+            font-weight: bold;
+        }
+        
+        /* קונפטי שמתפוצץ מהגירוד */
+        .confetti-particle { 
+            position: absolute; 
+            width: 10px; 
+            height: 10px; 
+            opacity: 0; 
+            pointer-events: none; 
+            z-index: 100;
+        }
     </style>
 </head>
 <body>
@@ -38,14 +138,27 @@
         { char: "הליצן המסתורי 🤡", msg: "חיוך הוא כוח-על.<br>הפוך/הפכי כל יום רגיל לחג!" }
     ];
 
-    function createConfetti(x, y) {
+    // פונקציה ליצירת קונפטי מתפוצץ
+    function createConfettiExplosion(x, y) {
         for(let i = 0; i < 20; i++) {
             const c = document.createElement('div');
-            c.className = 'confetti';
-            c.style.left = x + 'px'; c.style.top = y + 'px';
-            c.style.backgroundColor = ['#f44336', '#2196f3', '#ffeb3b', '#4caf50'][Math.floor(Math.random()*4)];
+            c.className = 'confetti-particle';
+            c.style.left = x + 'px'; 
+            c.style.top = y + 'px';
+            c.style.backgroundColor = ['#f44336', '#2196f3', '#ffeb3b', '#4caf50', '#e91e63'][Math.floor(Math.random()*5)];
             document.body.appendChild(c);
-            c.animate([{ transform: `translate(${Math.random()*200-100}px, ${Math.random()*200-100}px) rotate(360deg)`, opacity: 1 }, { opacity: 0 }], { duration: 1000 }).onfinish = () => c.remove();
+            
+            const destinationX = (Math.random() - 0.5) * 200;
+            const destinationY = (Math.random() - 0.5) * 200;
+            const rotation = Math.random() * 720;
+            
+            c.animate([
+                { transform: 'translate(0, 0) rotate(0deg)', opacity: 1 },
+                { transform: `translate(${destinationX}px, ${destinationY}px) rotate(${rotation}deg)`, opacity: 0 }
+            ], { 
+                duration: 1000 + Math.random() * 500,
+                easing: 'ease-out'
+            }).onfinish = () => c.remove();
         }
     }
 
@@ -53,29 +166,96 @@
     surprises.forEach((item, index) => {
         const wrapper = document.createElement('div');
         wrapper.className = 'card-wrapper';
-        wrapper.innerHTML = `<div class="result"><div class="char-name">${item.char}</div><div class="char-msg">${item.msg}</div></div><canvas id="canvas${index}" width="300" height="170"></canvas>`;
+        wrapper.innerHTML = `
+            <div class="result">
+                <div class="char-name">${item.char}</div>
+                <div class="char-msg">${item.msg}</div>
+            </div>
+            <canvas id="canvas${index}" width="300" height="170"></canvas>
+        `;
         container.appendChild(wrapper);
 
         const canvas = document.getElementById(`canvas${index}`);
         const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#9e9e9e'; ctx.fillRect(0, 0, 300, 170);
-        ctx.fillStyle = 'white'; ctx.font = 'bold 22px Arial'; ctx.textAlign = 'center'; ctx.fillText('🎭 גרד/י כאן! ✨', 150, 95);
+        
+        // שכבת גרוד
+        ctx.fillStyle = '#9e9e9e'; 
+        ctx.fillRect(0, 0, 300, 170);
+        
+        // טקסט על שכבת הגרוד
+        ctx.fillStyle = 'white'; 
+        ctx.font = 'bold 22px Arial'; 
+        ctx.textAlign = 'center'; 
+        ctx.fillText('🎭 גרד/י כאן! ✨', 150, 95);
 
         let isDrawing = false;
-        const move = (e) => {
-            if (!isDrawing) return;
+        
+        const getTouchPos = (e) => {
             const rect = canvas.getBoundingClientRect();
-            const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-            const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
-            ctx.globalCompositeOperation = 'destination-out';
-            ctx.beginPath(); ctx.arc(x, y, 20, 0, Math.PI * 2); ctx.fill();
-            if(Math.random() > 0.8) createConfetti(e.clientX || e.touches[0].clientX, e.clientY || e.touches[0].clientY);
+            return {
+                x: e.touches[0].clientX - rect.left,
+                y: e.touches[0].clientY - rect.top,
+                clientX: e.touches[0].clientX,
+                clientY: e.touches[0].clientY
+            };
         };
-        canvas.addEventListener('mousedown', () => isDrawing = true);
-        canvas.addEventListener('mousemove', move);
+
+        const getMousePos = (e) => {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top,
+                clientX: e.clientX,
+                clientY: e.clientY
+            };
+        };
+
+        const scratch = (x, y, clientX, clientY) => {
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath(); 
+            ctx.arc(x, y, 20, 0, Math.PI * 2); 
+            ctx.fill();
+            
+            // יצירת קונפטי תוך כדי גירוד (בהסתברות מסוימת)
+            if(Math.random() > 0.85) {
+                createConfettiExplosion(clientX, clientY);
+            }
+        };
+
+        // אירועי מוס (מחשב)
+        canvas.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            const pos = getMousePos(e);
+            scratch(pos.x, pos.y, pos.clientX, pos.clientY);
+        });
+        
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDrawing) return;
+            const pos = getMousePos(e);
+            scratch(pos.x, pos.y, pos.clientX, pos.clientY);
+        });
+        
         window.addEventListener('mouseup', () => isDrawing = false);
-        canvas.addEventListener('touchstart', () => isDrawing = true);
-        canvas.addEventListener('touchmove', move);
+
+        // אירועי מגע (מובייל)
+        canvas.addEventListener('touchstart', (e) => {
+            isDrawing = true;
+            if (e.touches.length === 1) {
+                const pos = getTouchPos(e);
+                scratch(pos.x, pos.y, pos.clientX, pos.clientY);
+            }
+        });
+        
+        canvas.addEventListener('touchmove', (e) => {
+            if (!isDrawing) return;
+            if (e.touches.length === 1) {
+                e.preventDefault(); // מניעת גלילה
+                const pos = getTouchPos(e);
+                scratch(pos.x, pos.y, pos.clientX, pos.clientY);
+            }
+        }, { passive: false });
+        
+        canvas.addEventListener('touchend', () => isDrawing = false);
     });
 </script>
 </body>
