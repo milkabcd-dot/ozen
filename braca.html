@@ -2,12 +2,19 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>פורים שמח - מכונת העצות</title>
     <style>
+        /* תיקון הגלילה: מונע גלילה אופקית לחלוטין */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            overflow-x: hidden; /* זה המפתח לנעילת התזוזה הצידית */
+        }
+
         body { 
             font-family: 'Segoe UI', sans-serif; 
-            /* החזרת רקע הנקודות הצבעוניות (קונפטי רקע) */
             background-color: #f3e5f5; 
             background-image: 
                 radial-gradient(#ffeb3b 10%, transparent 10%),
@@ -16,112 +23,68 @@
                 radial-gradient(#4caf50 10%, transparent 10%);
             background-size: 30px 30px;
             background-position: 0 0, 15px 15px, 0 15px, 15px 0;
-            
             text-align: center; 
             padding: 20px; 
             min-height: 100vh; 
-            margin: 0; 
             color: #4a148c; 
         }
         
-        h1 { 
-            color: #880e4f; 
-            font-size: 2.2em; 
-            margin-bottom: 5px; 
-            text-shadow: 2px 2px 4px rgba(255,255,255,0.8);
-        }
+        h1 { color: #880e4f; font-size: 2em; margin-bottom: 10px; text-shadow: 1px 1px 2px white; }
         
         .subtitle { 
-            font-size: 1.1em; 
+            font-size: 1em; 
             font-weight: bold; 
-            margin-bottom: 25px; 
+            margin-bottom: 20px; 
             background: rgba(255,255,255,0.7);
-            padding: 5px 15px;
+            padding: 10px;
             border-radius: 15px;
             display: inline-block;
+            max-width: 90%;
         }
         
         .container { 
             display: flex; 
             flex-wrap: wrap; 
             justify-content: center; 
-            gap: 25px; 
+            gap: 20px; 
+            padding-bottom: 20px;
         }
         
         .card-wrapper { 
             position: relative; 
-            width: 300px; 
-            height: 170px; 
+            width: 280px; /* מעט צר יותר כדי להתאים לכל מסך */
+            height: 160px; 
             border-radius: 15px; 
             overflow: hidden; 
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3); 
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2); 
             background: white; 
-            border: 4px solid #fff; 
+            border: 3px solid #fff; 
         }
         
         .result { 
-            position: absolute; 
-            width: 100%; 
-            height: 100%; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 10px; 
-            box-sizing: border-box; 
+            position: absolute; width: 100%; height: 100%; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            padding: 10px; box-sizing: border-box; 
             background: linear-gradient(135deg, #fff 0%, #fce4ec 100%); 
         }
         
-        .char-name { 
-            font-size: 1.3em; 
-            font-weight: bold; 
-            color: #880e4f; 
-            margin-bottom: 5px; 
-        }
+        .char-name { font-size: 1.2em; font-weight: bold; color: #880e4f; margin-bottom: 5px; }
+        .char-msg { font-size: 0.9em; color: #311b92; line-height: 1.3; text-align: center; }
         
-        .char-msg { 
-            font-size: 0.95em; 
-            color: #311b92; 
-            line-height: 1.4; 
-            text-align: center; 
-        }
-        
-        canvas { 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            z-index: 10; 
-            touch-action: none; 
-            cursor: pointer; 
-        }
+        canvas { position: absolute; top: 0; left: 0; z-index: 10; touch-action: none; cursor: pointer; }
         
         .credit { 
-            margin-top: 50px; 
-            font-size: 1.1em; 
-            color: #fff; 
-            background: #880e4f; 
-            padding: 10px 20px; 
-            border-radius: 50px; 
-            display: inline-block; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
-            border: 2px solid #ffd700; 
-            font-weight: bold;
+            margin-top: 30px; font-size: 1em; color: #fff; background: #880e4f; 
+            padding: 8px 15px; border-radius: 30px; display: inline-block; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2); border: 2px solid #ffd700; font-weight: bold;
         }
         
-        /* קונפטי שמתפוצץ מהגירוד */
-        .confetti-particle { 
-            position: absolute; 
-            width: 10px; 
-            height: 10px; 
-            opacity: 0; 
-            pointer-events: none; 
-            z-index: 100;
-        }
+        .confetti-particle { position: absolute; width: 8px; height: 8px; opacity: 0; pointer-events: none; z-index: 100; }
     </style>
 </head>
 <body>
 
-    <h1>🎭 פורים שמח ומבדח! 🎭</h1>
+    <h1>🎭 פורים שמח ומבדח!</h1>
     <div class="subtitle">גרד/י את אחד הכרטיסים וקבל/י עצה מדמות במגילה:</div>
 
     <div class="container" id="cards-container"></div>
@@ -138,27 +101,16 @@
         { char: "הליצן המסתורי 🤡", msg: "חיוך הוא כוח-על.<br>הפוך/הפכי כל יום רגיל לחג!" }
     ];
 
-    // פונקציה ליצירת קונפטי מתפוצץ
     function createConfettiExplosion(x, y) {
-        for(let i = 0; i < 20; i++) {
+        for(let i = 0; i < 15; i++) {
             const c = document.createElement('div');
             c.className = 'confetti-particle';
-            c.style.left = x + 'px'; 
-            c.style.top = y + 'px';
-            c.style.backgroundColor = ['#f44336', '#2196f3', '#ffeb3b', '#4caf50', '#e91e63'][Math.floor(Math.random()*5)];
+            c.style.left = x + 'px'; c.style.top = y + 'px';
+            c.style.backgroundColor = ['#f44336', '#2196f3', '#ffeb3b', '#4caf50'][Math.floor(Math.random()*4)];
             document.body.appendChild(c);
-            
-            const destinationX = (Math.random() - 0.5) * 200;
-            const destinationY = (Math.random() - 0.5) * 200;
-            const rotation = Math.random() * 720;
-            
-            c.animate([
-                { transform: 'translate(0, 0) rotate(0deg)', opacity: 1 },
-                { transform: `translate(${destinationX}px, ${destinationY}px) rotate(${rotation}deg)`, opacity: 0 }
-            ], { 
-                duration: 1000 + Math.random() * 500,
-                easing: 'ease-out'
-            }).onfinish = () => c.remove();
+            c.animate([{ transform: 'translate(0,0) rotate(0deg)', opacity: 1 }, 
+                       { transform: `translate(${(Math.random()-0.5)*150}px, ${(Math.random()-0.5)*150}px) rotate(360deg)`, opacity: 0 }], 
+                      { duration: 800 }).onfinish = () => c.remove();
         }
     }
 
@@ -166,95 +118,30 @@
     surprises.forEach((item, index) => {
         const wrapper = document.createElement('div');
         wrapper.className = 'card-wrapper';
-        wrapper.innerHTML = `
-            <div class="result">
-                <div class="char-name">${item.char}</div>
-                <div class="char-msg">${item.msg}</div>
-            </div>
-            <canvas id="canvas${index}" width="300" height="170"></canvas>
-        `;
+        wrapper.innerHTML = `<div class="result"><div class="char-name">${item.char}</div><div class="char-msg">${item.msg}</div></div><canvas id="canvas${index}" width="280" height="160"></canvas>`;
         container.appendChild(wrapper);
 
         const canvas = document.getElementById(`canvas${index}`);
         const ctx = canvas.getContext('2d');
-        
-        // שכבת גרוד
-        ctx.fillStyle = '#9e9e9e'; 
-        ctx.fillRect(0, 0, 300, 170);
-        
-        // טקסט על שכבת הגרוד
-        ctx.fillStyle = 'white'; 
-        ctx.font = 'bold 22px Arial'; 
-        ctx.textAlign = 'center'; 
-        ctx.fillText('🎭 גרד/י כאן! ✨', 150, 95);
+        ctx.fillStyle = '#9e9e9e'; ctx.fillRect(0, 0, 280, 160);
+        ctx.fillStyle = 'white'; ctx.font = 'bold 20px Arial'; ctx.textAlign = 'center'; ctx.fillText('🎭 גרד/י כאן! ✨', 140, 85);
 
         let isDrawing = false;
-        
-        const getTouchPos = (e) => {
+        const scratch = (e) => {
+            if (!isDrawing) return;
             const rect = canvas.getBoundingClientRect();
-            return {
-                x: e.touches[0].clientX - rect.left,
-                y: e.touches[0].clientY - rect.top,
-                clientX: e.touches[0].clientX,
-                clientY: e.touches[0].clientY
-            };
-        };
-
-        const getMousePos = (e) => {
-            const rect = canvas.getBoundingClientRect();
-            return {
-                x: e.clientX - rect.left,
-                y: e.clientY - rect.top,
-                clientX: e.clientX,
-                clientY: e.clientY
-            };
-        };
-
-        const scratch = (x, y, clientX, clientY) => {
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
             ctx.globalCompositeOperation = 'destination-out';
-            ctx.beginPath(); 
-            ctx.arc(x, y, 20, 0, Math.PI * 2); 
-            ctx.fill();
-            
-            // יצירת קונפטי תוך כדי גירוד (בהסתברות מסוימת)
-            if(Math.random() > 0.85) {
-                createConfettiExplosion(clientX, clientY);
-            }
+            ctx.beginPath(); ctx.arc(clientX - rect.left, clientY - rect.top, 20, 0, Math.PI * 2); ctx.fill();
+            if(Math.random() > 0.85) createConfettiExplosion(clientX, clientY);
         };
 
-        // אירועי מוס (מחשב)
-        canvas.addEventListener('mousedown', (e) => {
-            isDrawing = true;
-            const pos = getMousePos(e);
-            scratch(pos.x, pos.y, pos.clientX, pos.clientY);
-        });
-        
-        canvas.addEventListener('mousemove', (e) => {
-            if (!isDrawing) return;
-            const pos = getMousePos(e);
-            scratch(pos.x, pos.y, pos.clientX, pos.clientY);
-        });
-        
+        canvas.addEventListener('mousedown', () => isDrawing = true);
+        canvas.addEventListener('mousemove', scratch);
         window.addEventListener('mouseup', () => isDrawing = false);
-
-        // אירועי מגע (מובייל)
-        canvas.addEventListener('touchstart', (e) => {
-            isDrawing = true;
-            if (e.touches.length === 1) {
-                const pos = getTouchPos(e);
-                scratch(pos.x, pos.y, pos.clientX, pos.clientY);
-            }
-        });
-        
-        canvas.addEventListener('touchmove', (e) => {
-            if (!isDrawing) return;
-            if (e.touches.length === 1) {
-                e.preventDefault(); // מניעת גלילה
-                const pos = getTouchPos(e);
-                scratch(pos.x, pos.y, pos.clientX, pos.clientY);
-            }
-        }, { passive: false });
-        
+        canvas.addEventListener('touchstart', () => isDrawing = true);
+        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); scratch(e); }, { passive: false });
         canvas.addEventListener('touchend', () => isDrawing = false);
     });
 </script>
