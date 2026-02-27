@@ -8,7 +8,6 @@
         body { 
             font-family: 'Segoe UI', sans-serif; 
             margin: 0; padding: 20px; text-align: center; color: #4a148c;
-            /* הטאפט הצבעוני המקורי */
             background-color: #f3e5f5; 
             background-image: 
                 radial-gradient(#ffeb3b 10%, transparent 10%),
@@ -22,7 +21,6 @@
         h1 { color: #880e4f; font-size: 2.2em; margin-bottom: 5px; }
         .subtitle { font-size: 1.1em; font-weight: bold; margin-bottom: 25px; background: rgba(255,255,255,0.7); padding: 10px; border-radius: 15px; display: inline-block; }
         
-        /* המרכוז הקבוע */
         .container { 
             display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
             gap: 20px; width: 100%; max-width: 900px; margin: 0 auto;
@@ -35,6 +33,9 @@
         }
         
         canvas { position: absolute; top: 0; left: 0; z-index: 10; touch-action: none; cursor: pointer; }
+        
+        .confetti-particle { position: absolute; width: 8px; height: 8px; opacity: 0; pointer-events: none; z-index: 100; }
+        
         .credit { margin-top: 40px; font-size: 1.1em; color: #880e4f; font-weight: bold; }
     </style>
 </head>
@@ -49,13 +50,26 @@
 
 <script>
     const surprises = [
-        { char: "אסתר המלכה 👑", msg: "יש לך כוח השפעה אדיר.<br>זה הזמן להשמיע את הקול שלך!" },
-        { char: "מרדכי הצדיק 📜", msg: "התמדה בדרך שלך היא המפתח.<br>מומלץ ללכת בראש מורם." },
-        { char: "אחשוורוש החגיגי 🍷", msg: "החיים הם מסיבה!<br>זמן מצוין ליהנות מהרגע." },
-        { char: "ושתי העצמאית 💅", msg: "הידיעה מה הערך שלך היא כוח.<br>לפעמים 'לא' זה נכון." },
-        { char: "המן (בגרסה טובה) 📐", msg: "יש לך יכולת תכנון נהדרת.<br>נתב/י את זה לטובה." },
-        { char: "הליצן המסתורי 🤡", msg: "חיוך הוא כוח-על.<br>הפוך/הפכי כל יום לחג!" }
+        { char: "אסתר המלכה 👑", msg: "יש לך כוח השפעה אדיר." },
+        { char: "מרדכי הצדיק 📜", msg: "התמדה בדרך שלך היא המפתח." },
+        { char: "אחשוורוש החגיגי 🍷", msg: "החיים הם מסיבה!" },
+        { char: "ושתי העצמאית 💅", msg: "דע/י את הערך שלך." },
+        { char: "המן (בגרסה טובה) 📐", msg: "נתב/י את הכישרון לעשיית טוב." },
+        { char: "הליצן המסתורי 🤡", msg: "חיוך הוא כוח-על!" }
     ];
+
+    function createConfetti(x, y) {
+        for(let i = 0; i < 15; i++) {
+            const c = document.createElement('div');
+            c.className = 'confetti-particle';
+            c.style.left = x + 'px'; c.style.top = y + 'px';
+            c.style.backgroundColor = ['#f44336', '#2196f3', '#ffeb3b', '#4caf50'][Math.floor(Math.random()*4)];
+            document.body.appendChild(c);
+            c.animate([{ transform: 'translate(0,0) rotate(0deg)', opacity: 1 }, 
+                       { transform: `translate(${(Math.random()-0.5)*150}px, ${(Math.random()-0.5)*150}px) rotate(360deg)`, opacity: 0 }], 
+                      { duration: 800 }).onfinish = () => c.remove();
+        }
+    }
 
     const container = document.getElementById('cards-container');
     surprises.forEach((item, index) => {
@@ -67,18 +81,17 @@
         const canvas = document.getElementById(`canvas${index}`);
         const ctx = canvas.getContext('2d');
         ctx.fillStyle = '#9e9e9e'; ctx.fillRect(0, 0, 280, 160);
-        ctx.fillStyle = 'white'; ctx.font = '20px Arial'; ctx.textAlign = 'center'; ctx.fillText('🎭 גרד/י כאן! ✨', 140, 85);
+        ctx.fillStyle = 'white'; ctx.font = '20px Arial'; ctx.textAlign = 'center'; ctx.fillText('גרד/י כאן!', 140, 85);
 
-        const scratch = (e) => {
+        const scratch = (clientX, clientY) => {
             const rect = canvas.getBoundingClientRect();
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
             ctx.globalCompositeOperation = 'destination-out';
             ctx.beginPath(); ctx.arc(clientX - rect.left, clientY - rect.top, 20, 0, Math.PI * 2); ctx.fill();
+            if(Math.random() > 0.85) createConfetti(clientX, clientY);
         };
 
-        canvas.addEventListener('mousemove', (e) => { if(e.buttons) scratch(e); });
-        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); scratch(e); }, { passive: false });
+        canvas.addEventListener('mousemove', (e) => { if(e.buttons) scratch(e.clientX, e.clientY); });
+        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); scratch(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
     });
 </script>
 </body>
