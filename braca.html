@@ -2,38 +2,126 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>איזו דמות פורים את/ה?</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>פורים שמח! כרטיסי הפתעה</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fdf6e3; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; max-width: 400px; border: 3px solid #8e44ad; }
-        h1 { color: #8e44ad; }
-        button { background-color: #f1c40f; border: none; padding: 15px 25px; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 20px; transition: 0.3s; }
-        button:hover { background-color: #d4ac0d; }
-        #result { margin-top: 20px; font-size: 18px; color: #333; font-weight: bold; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #fce4ec, #f8bbd0); 
+            text-align: center; 
+            padding: 20px; 
+            min-height: 100vh;
+            margin: 0;
+        }
+        h1 { color: #880e4f; text-shadow: 1px 1px 2px white; }
+        .container { 
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+            gap: 20px; 
+            margin-top: 20px;
+        }
+        .card-wrapper { 
+            position: relative; 
+            width: 300px; 
+            height: 150px; 
+            border-radius: 15px; 
+            overflow: hidden; 
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2); 
+            background: white;
+        }
+        .result { 
+            position: absolute; 
+            width: 100%; 
+            height: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            color: #880e4f; 
+            padding: 10px; 
+            box-sizing: border-box;
+        }
+        canvas { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            z-index: 10; 
+            touch-action: none; /* קריטי למובייל - מונע גלילת מסך בזמן גירוד */
+        }
+        .btn-reset { margin-top: 30px; padding: 10px 20px; background: #880e4f; color: white; border: none; border-radius: 20px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h1>🎭 פורים שמח!</h1>
-    <p>לחצו על הכפתור כדי לגלות איזו דמות פורימית אתם השנה:</p>
-    <button onclick="reveal()">גלה את הדמות שלי!</button>
-    <div id="result"></div>
-</div>
+<h1>🎭 גרוד וגלה את הפתעת הפורים שלך!</h1>
+<p>גרד את הכרטיס עם העכבר או האצבע</p>
+
+<div class="container" id="cards-container"></div>
+
+<button class="btn-reset" onclick="location.reload()">רענן את הכל</button>
 
 <script>
-    function reveal() {
-        const characters = [
-            "אסתר המלכה – את/ה חכם/ה, אמיץ/ה ויודע/ת להוביל את העניינים!",
-            "מרדכי היהודי – עקשן/ית לטובה, נאמן/ה לעצמך ולא מוותר/ת על עקרונות.",
-            "אחשוורוש – נהנתן/ית קלאסי/ת, יודע/ת ליהנות מהחיים (ולפעמים קצת מפוזר/ת!).",
-            "ושתי – חזק/ה, עצמאי/ת ולא דופק/ת חשבון לאף אחד!",
-            "ליצן פורים – את/ה הנשמה של החברה, תמיד מחפש/ת את הצחוק."
-        ];
-        const randomChar = characters[Math.floor(Math.random() * characters.length)];
-        document.getElementById("result").innerText = "יצאת: " + randomChar;
-    }
-</script>
+    const surprises = [
+        { char: "אסתר המלכה 👑", msg: "יש לך כוח השפעה אדיר, אל תפחדי להשמיע את קולך!" },
+        { char: "מרדכי הצדיק 📜", msg: "התמדה היא המפתח שלך השנה. תמשיך בדרך שלך!" },
+        { char: "אחשוורוש החגיגי 🍷", msg: "הגיע הזמן למסיבה - תהנה מהחיים ותחגוג בגדול!" },
+        { char: "הליצן המסתורי 🤡", msg: "תחפושת מושלמת כבר יש לך - השנה הכל יצליח!" }
+    ];
 
+    const container = document.getElementById('cards-container');
+
+    surprises.forEach((item, index) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'card-wrapper';
+        wrapper.innerHTML = `
+            <div class="result">
+                <div style="font-size: 1.2em;"><strong>${item.char}</strong></div>
+                <p>${item.msg}</p>
+            </div>
+            <canvas id="canvas${index}" width="300" height="150"></canvas>
+        `;
+        container.appendChild(wrapper);
+
+        const canvas = document.getElementById(`canvas${index}`);
+        const ctx = canvas.getContext('2d');
+        
+        // ציור שכבת הגרוד
+        ctx.fillStyle = '#9e9e9e';
+        ctx.fillRect(0, 0, 300, 150);
+        ctx.fillStyle = 'white';
+        ctx.font = '20px Arial';
+        ctx.fillText('גרד כאן!', 110, 85);
+
+        // לוגיקת גרוד (עכבר ומגע)
+        let isDrawing = false;
+
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return { x: clientX - rect.left, y: clientY - rect.top };
+        }
+
+        const start = () => isDrawing = true;
+        const end = () => isDrawing = false;
+        const move = (e) => {
+            if (!isDrawing) return;
+            const pos = getPos(e);
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, 20, 0, Math.PI * 2);
+            ctx.fill();
+        };
+
+        canvas.addEventListener('mousedown', start);
+        canvas.addEventListener('mousemove', move);
+        canvas.addEventListener('mouseup', end);
+        
+        canvas.addEventListener('touchstart', start);
+        canvas.addEventListener('touchmove', move);
+        canvas.addEventListener('touchend', end);
+    });
+</script>
 </body>
 </html>
